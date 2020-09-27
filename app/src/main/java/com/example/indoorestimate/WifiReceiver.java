@@ -17,12 +17,14 @@ class WifiReceiver extends BroadcastReceiver {
     private TextView scanTime;
     private List<SCANINFO> scanList;
     private TextView result;
+    MapDraw mapDraw;
 
-    public WifiReceiver(WifiManager wifiManager, TextView scanTime, List<SCANINFO> scanList, TextView result) {
+    public WifiReceiver(WifiManager wifiManager, TextView scanTime, List<SCANINFO> scanList, TextView result, MapDraw mapDraw) {
         this.wifiManager = wifiManager;
         this.scanTime = scanTime;
         this.scanList = scanList;
         this.result = result;
+        this.mapDraw = mapDraw;
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -39,11 +41,25 @@ class WifiReceiver extends BroadcastReceiver {
                 //scanresult feild 참고 - https://developer.android.com/reference/android/net/wifi/ScanResult?hl=ko
                 //ssid, bssid(mac address), level(rssi), timestamp(언제 scan했는지), frequency 등..
 
-                scanList.add(new SCANINFO(scanResult.BSSID.replace(":", ""), scanResult.level));
+                scanList.add(new SCANINFO(scanResult.BSSID.replace(";", ""), scanResult.level));
             }
 
             Estimate test = new Estimate(context, scanList);
-            result.setText(test.test_main());
+
+            String scanResult = test.test_main();
+            if(scanResult.equals("NORESULT")) {
+                result.setText("결과 없음");
+                Toast.makeText(context, "결과 없음", Toast.LENGTH_SHORT).show();
+            } else {
+                String[] result_array = scanResult.split("/");
+
+                float x = Float.parseFloat(result_array[0]);
+                float y = Float.parseFloat(result_array[1]);
+
+                mapDraw.setXY(x, y);
+                result.setText("x 좌표 : " + x + "\ny 좌표 : " + y);
+                Toast.makeText(context, "측정 완료!", Toast.LENGTH_SHORT).show();
+            }
 
             //test_scan(context);
 
@@ -51,8 +67,6 @@ class WifiReceiver extends BroadcastReceiver {
             SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
             String formatDate = sdfNow.format(date);
             scanTime.setText("측정 시간 " + formatDate);
-
-            Toast.makeText(context, "측정완료!", Toast.LENGTH_SHORT).show();
         } else {
             //참고 :: fail 시 첫 스캔이면 아무 것도 반환 안 하고 n번째 스캔이면 results 에 이전 결과가 출력됨.
             System.out.println("fail");
@@ -74,7 +88,21 @@ class WifiReceiver extends BroadcastReceiver {
         }
 
         Estimate test = new Estimate(context, scanList);
-        result.setText(test.test_main());
+
+        String scanResult = test.test_main();
+        if(scanResult.equals("NORESULT")) {
+            result.setText("결과 없음");
+            Toast.makeText(context, "결과 없음", Toast.LENGTH_SHORT).show();
+        } else {
+            String[] result_array = scanResult.split("/");
+
+            float x = Float.parseFloat(result_array[0]);
+            float y = Float.parseFloat(result_array[1]);
+
+            mapDraw.setXY(x, y);
+            result.setText("x 좌표 : " + x + "\ny 좌표 : " + y);
+            Toast.makeText(context, "측정 완료!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

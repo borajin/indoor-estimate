@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.mikephil.charting.charts.ScatterChart;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private Button startBtn;
     private TextView scanTime;
     private TextView requestTime;
-
     private TextView result;
+    private ScatterChart map;
+    MapDraw mapDraw;
 
     List<SCANINFO> scanList = new ArrayList<>();
 
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         scanTime = findViewById(R.id.scanTime);
         requestTime = findViewById(R.id.requestTime);
         result = findViewById(R.id.result);
+        map = findViewById(R.id.map);
 
         startBtn.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -76,13 +80,16 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "측정중...", Toast.LENGTH_SHORT).show();
             }
         });
+
+        mapDraw = new MapDraw(this, map);
+        mapDraw.setMapData();
     }
 
     //마지막 초기화 작업?? onresume은 activity가 전면에 나타날 때, oncreate 호출 이후에도 호출됨.
     @Override
     public void onResume() {
         super.onResume();
-        receiverWifi = new WifiReceiver(wifiManager, scanTime, scanList, result);
+        receiverWifi = new WifiReceiver(wifiManager, scanTime, scanList, result, mapDraw);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(receiverWifi, intentFilter);
@@ -172,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void DBdownload() {
-        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1uvJgvziZe1lR_3Nvpy-iqNpMqZckrtJx";
+        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1nBdiaO3s9muQb16vaFItDiKp111bp7VN";
 
         if (checkNetwork()) {
             new DBdownload(this).execute(DB_DOWNLOAD_URL, "1", "1");
@@ -194,5 +201,9 @@ public class MainActivity extends AppCompatActivity {
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             startActivity(intent);
         }
+    }
+
+    private void setMap() {
+
     }
 }

@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
 
     <LinearLayout
         android:id="@+id/resultView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/sysMsgView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/resultViewTitle"
@@ -53,35 +51,30 @@
             android:padding="5dp"
             android:text="RESULT"
             android:textColor="#000000"
-            android:textSize="14sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/sysMsgView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/resultView">
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/blankView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFC107"
-            android:text="허전해서 넣어본 레이아웃"
+            android:text="MAP"
             android:textColor="#000000"
             android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/blackMsg"
+        <com.github.mikephil.charting.charts.ScatterChart
+            android:id="@+id/map"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="정말 허전하다"
-            android:textSize="14sp" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <Button
@@ -91,13 +84,7 @@
         android:background="#FFC107"
         android:text="SCAN"
         android:textColor="#000000"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sysMsgView"
-        app:layout_constraintVertical_bias="1.0" />
+        android:textSize="18sp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
 

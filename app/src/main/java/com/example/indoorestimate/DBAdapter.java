@@ -10,12 +10,12 @@ public class DBAdapter {
     private Context context;
     private SQLiteDatabase db;
 
-    private static String DB_PATH = "/data/data/com.example.wifi_fp_estimate/databases";
+    private static String DB_PATH = "/data/data/com.example.indoorestimate/databases";
     private static String DB_NAME = "/test.db";
 
     public DBAdapter(Context context) {
         super();
-        context = context;
+        this.context = context;
 
         File dbCopy = new File(DB_PATH + DB_NAME);
 
@@ -26,11 +26,12 @@ public class DBAdapter {
     }
 
     public void close() {
-        this.db.close();
+        db.close();
     }
 
     public Cursor search(String sql) {
         Cursor cursor = db.rawQuery(sql, null);
+
         return cursor;
     }
 }

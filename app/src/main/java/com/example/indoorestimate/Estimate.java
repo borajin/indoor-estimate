@@ -54,9 +54,8 @@ public class Estimate {
 
         if (cursor != null) {
             result = true;
-            cursor.close();
-            //todo : cursor 가 null 값 가지면 close 안 해도 되는지?
         }
+        cursor.close();
 
         return result;
     }
@@ -76,7 +75,7 @@ public class Estimate {
         // rssi 값 총합이 0이면..
         if (totalWF == 0) {
             scanList.clear();
-            return "no ap";
+            return "NORESULT";
         }
 
         // search FP   <====    main algorithm !!
@@ -160,13 +159,11 @@ public class Estimate {
         if (fpList.size() > 0) {
             String result;
 
-            result = "[by reference count] " + "\nposX: " + fpList.get(posIdxByRef).x + "\nposY: " + fpList.get(posIdxByRef).y + "\nrefCount : " + fpList.get(posIdxByRef).refCount + "\nscore : " + fpList.get(posIdxByRef).score;
-            result = result + "\n\n";
-            result = result + "[by score]" + "\nposX: " + fpList.get(posIdxByScore).x + "\nposY: " + fpList.get(posIdxByRef).y + "\nrefCount : " + fpList.get(posIdxByRef).refCount + "\nscore : " + fpList.get(posIdxByRef).score;
+            result = fpList.get(posIdxByScore).x + "/" +  fpList.get(posIdxByRef).y;
 
             return result;
         }
 
-        return "no result";
+        return "NORESULT";
     }
 }

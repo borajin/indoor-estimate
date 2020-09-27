@@ -22,7 +22,7 @@ public class DBdownload extends AsyncTask<String, String, String> {
 
 
     public DBdownload(Context context) {
-        context = context;
+        this.context = context;
     }
 
     @Override
