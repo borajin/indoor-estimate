@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mapDraw = new MapDraw(this, map);
-        mapDraw.setMapData();
     }
 
     //마지막 초기화 작업?? onresume은 activity가 전면에 나타날 때, oncreate 호출 이후에도 호출됨.

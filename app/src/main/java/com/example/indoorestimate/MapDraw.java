@@ -30,6 +30,7 @@ public class MapDraw implements OnChartValueSelectedListener {
     public MapDraw(Context context, ScatterChart map) {
         this.context = context;
         this.map = map;
+        get_min();
 
         map.getDescription().setEnabled(false);
         map.setOnChartValueSelectedListener(this);
@@ -62,6 +63,8 @@ public class MapDraw implements OnChartValueSelectedListener {
         XAxis xl = map.getXAxis();
         //xl.setTypeface(tfLight);
         xl.setDrawGridLines(true);
+
+        setMapData();
     }
 
     @Override
@@ -107,13 +110,11 @@ public class MapDraw implements OnChartValueSelectedListener {
         cursor.close();
     }
 
-    public void setMapData() {
+    private void setMapData() {
         ArrayList<Entry> values1 = new ArrayList<>();
         DBAdapter dbAdapter = new DBAdapter(context);
 
         Cursor cursor = dbAdapter.search("SELECT * FROM TR_FPDB");
-
-        get_min();
 
         while(cursor.moveToNext()) {
             float x = cursor.getFloat(cursor.getColumnIndex("TM_X")) - minX;
@@ -142,8 +143,6 @@ public class MapDraw implements OnChartValueSelectedListener {
     }
 
     public void setXY(float x, float y) {
-        get_min();
-
         x = x - minX;
         y = y - minY;
 

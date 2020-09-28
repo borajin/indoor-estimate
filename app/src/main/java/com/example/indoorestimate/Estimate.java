@@ -159,7 +159,9 @@ public class Estimate {
         if (fpList.size() > 0) {
             String result;
 
-            result = fpList.get(posIdxByScore).x + "/" +  fpList.get(posIdxByRef).y;
+            //by score => posIdxByScore
+            //by ref => posIdxByRef
+            result = fpList.get(posIdxByScore).x + "/" +  fpList.get(posIdxByScore).y;
 
             return result;
         }
