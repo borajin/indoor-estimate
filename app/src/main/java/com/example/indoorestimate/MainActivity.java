@@ -51,12 +51,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setUI();
+        do {
+            //todo : 비동기로 처리해야 함... 퍼미션 체크(처음만) > db 체크(처음만) > wifi 체크(계속) > gps 체크(계속)
+            checkPermission();
+            DBCheck();
+            GPSCheck();
+        } while(testFlag == false);
 
-        //todo : 비동기로 처리해야 함... 퍼미션 체크(처음만) > db 체크(처음만) > wifi 체크(계속) > gps 체크(계속)
-        checkPermission();
-        DBCheck();
-        GPSCheck();
+        setUI();
     }
 
     private void setUI() {
