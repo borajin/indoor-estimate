@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     List<SCANINFO> scanList = new ArrayList<>();
 
+    boolean testFlag = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,8 +176,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (!target.exists()) {
             DBdownload();
+            testFlag = true;
         } else {
             Toast.makeText(this, "DB파일 존재", Toast.LENGTH_SHORT).show();
+            testFlag = true;
         }
     }
 
