@@ -3,6 +3,7 @@ package com.example.indoorestimate;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -17,8 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.github.mikephil.charting.charts.ScatterChart;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -38,61 +37,42 @@ public class MainActivity extends AppCompatActivity {
     private WifiReceiver receiverWifi;
 
     private Button startBtn;
-    private TextView scanTime;
-    private TextView requestTime;
     private TextView result;
-    private ScatterChart map;
-    MapDraw mapDraw;
 
     List<SCANINFO> scanList = new ArrayList<>();
-
-    boolean testFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        do {
-            //todo : 비동기로 처리해야 함... 퍼미션 체크(처음만) > db 체크(처음만) > wifi 체크(계속) > gps 체크(계속)
-            checkPermission();
-            DBCheck();
-            GPSCheck();
-        } while(testFlag == false);
-
         setUI();
+
+        checkPermission();
+        GPSCheck();
+        checkNetwork();
+        DBCheck();
     }
 
     private void setUI() {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         startBtn = findViewById(R.id.startBtn);
-        scanTime = findViewById(R.id.scanTime);
-        requestTime = findViewById(R.id.requestTime);
         result = findViewById(R.id.result);
-        map = findViewById(R.id.map);
 
         startBtn.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Date date = new Date(System.currentTimeMillis());
-                SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
-                String formatDate = sdfNow.format(date);
-
-                requestTime.setText("요청 시간 " + formatDate);
                 wifiManager.startScan();
-
                 Toast.makeText(getApplicationContext(), "측정중...", Toast.LENGTH_SHORT).show();
             }
         });
-
-        mapDraw = new MapDraw(this, map);
     }
 
     //마지막 초기화 작업?? onresume은 activity가 전면에 나타날 때, oncreate 호출 이후에도 호출됨.
     @Override
     public void onResume() {
         super.onResume();
-        receiverWifi = new WifiReceiver(wifiManager, scanTime, scanList, result, mapDraw);
+        receiverWifi = new WifiReceiver(wifiManager, scanList, result);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(receiverWifi, intentFilter);
@@ -155,46 +135,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkNetwork() {
+    private void checkNetwork() {
         ConnectivityManager manager = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
 
         if (networkInfo != null) {
             int type = networkInfo.getType();
             if (type == ConnectivityManager.TYPE_MOBILE) {//쓰리지나 LTE로 연결된것(모바일을 뜻한다.)
-                return true;
+                turnOnWifi();
             } else if (type == ConnectivityManager.TYPE_WIFI) {//와이파이 연결된것
-                return true;
+
             }
         }
 
-        return false;
+        turnOnWifi();
+    }
+
+    private void turnOnWifi() {
+        message("wifi 킴");
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
+        wifi.setWifiEnabled(true);
     }
 
     private void DBCheck() {
         File target = new File("/data/data/com.example.indoorestimate/databases/test.db");
 
-        if (!target.exists()) {
+        if (!target.exists() || target.length() <= 0) {
+            message("db파일 없음");
             DBdownload();
-            testFlag = true;
         } else {
-            Toast.makeText(this, "DB파일 존재", Toast.LENGTH_SHORT).show();
-            testFlag = true;
+            message("db파일 존재");
         }
     }
 
     private void DBdownload() {
-        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1nBdiaO3s9muQb16vaFItDiKp111bp7VN";
-
-        if (checkNetwork()) {
-            new DBdownload(this).execute(DB_DOWNLOAD_URL, "1", "1");
-        } else {
-            Toast.makeText(this, "다운로드를 위해 와이파이를 킵니다.", Toast.LENGTH_SHORT).show();
-            WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
-            wifi.setWifiEnabled(true);
-
-            DBdownload();
-        }
+        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1OxArgC_Jh0CEUZrF0pP_ZPjm6KHgmeQA";
+        new DBdownload(this).execute(DB_DOWNLOAD_URL, "1", "1");
     }
 
     private void GPSCheck() {
@@ -205,10 +181,13 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             startActivity(intent);
+        } else {
+
         }
     }
 
-    private void setMap() {
-
+    private void message(final String msg) {
+        final String message = msg;
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 }

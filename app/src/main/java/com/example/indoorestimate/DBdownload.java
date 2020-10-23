@@ -71,6 +71,7 @@ public class DBdownload extends AsyncTask<String, String, String> {
                 total += count;
                 publishProgress("" + (int) ((total * 100) / lenghtOfFile));
                 bos.write(buf, 0, count);
+                System.out.println("다운중");
             }
 
             bos.close();

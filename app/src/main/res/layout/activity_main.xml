@@ -25,24 +25,6 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/requestTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:text="요청 시간 00:00:00"
-            android:textColor="#000000"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/scanTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:text="측정 시간 00:00:00"
-            android:textColor="#FF0000"
-            android:textSize="18sp" />
-
-        <TextView
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,11 +52,6 @@
             android:textColor="#000000"
             android:textSize="18sp" />
 
-        <com.github.mikephil.charting.charts.ScatterChart
-            android:id="@+id/map"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
     </LinearLayout>
 
     <Button

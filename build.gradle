@@ -14,7 +14,6 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url 'https://jitpack.io' } //분산차트 그리기
         google()
         jcenter()
     }

@@ -14,17 +14,13 @@ import java.util.List;
 
 class WifiReceiver extends BroadcastReceiver {
     private WifiManager wifiManager;
-    private TextView scanTime;
     private List<SCANINFO> scanList;
     private TextView result;
-    MapDraw mapDraw;
 
-    public WifiReceiver(WifiManager wifiManager, TextView scanTime, List<SCANINFO> scanList, TextView result, MapDraw mapDraw) {
+    public WifiReceiver(WifiManager wifiManager, List<SCANINFO> scanList, TextView result) {
         this.wifiManager = wifiManager;
-        this.scanTime = scanTime;
         this.scanList = scanList;
         this.result = result;
-        this.mapDraw = mapDraw;
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -35,14 +31,8 @@ class WifiReceiver extends BroadcastReceiver {
 
         //인텐트 쪽에서 scan 한 상태가 되면 scan 결과 처리하는 braodcast (개발자가 custom status 도 처리 할 수 있음)
         if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {
-
-            real_scan(context);
-            //test_scan(context);
-
-            Date date = new Date(System.currentTimeMillis());
-            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
-            String formatDate = sdfNow.format(date);
-            scanTime.setText("측정 시간 " + formatDate);
+            //real_scan(context);
+            test_scan(context);
         } else {
             //참고 :: fail 시 첫 스캔이면 아무 것도 반환 안 하고 n번째 스캔이면 results 에 이전 결과가 출력됨.
             System.out.println("fail");
@@ -52,27 +42,26 @@ class WifiReceiver extends BroadcastReceiver {
     private void real_scan(Context context) {
         List<ScanResult> wifiList = wifiManager.getScanResults();
 
+        long start = System.currentTimeMillis();
         for (ScanResult scanResult : wifiList) {
             //scanresult feild 참고 - https://developer.android.com/reference/android/net/wifi/ScanResult?hl=ko
             //ssid, bssid(mac address), level(rssi), timestamp(언제 scan했는지), frequency 등..
-
             scanList.add(new SCANINFO(scanResult.BSSID.replace(":", ""), scanResult.level));
         }
+        long end = System.currentTimeMillis();
+        System.out.println("scan time : " + (end - start)/1000.0);
 
+        start = System.currentTimeMillis();
         Estimate test = new Estimate(context, scanList);
         String scanResult = test.test_main();
+        end = System.currentTimeMillis();
+        System.out.println("estimate time : " + (end - start)/1000.0);
 
         if(scanResult.equals("NORESULT")) {
             result.setText("결과 없음");
             Toast.makeText(context, "결과 없음", Toast.LENGTH_SHORT).show();
         } else {
-            String[] result_array = scanResult.split("/");
-
-            float x = Float.parseFloat(result_array[0]);
-            float y = Float.parseFloat(result_array[1]);
-
-            mapDraw.setXY(x, y);
-            result.setText("x 좌표 : " + x + "\ny 좌표 : " + y);
+            result.setText(scanResult);
             Toast.makeText(context, "측정 완료!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -93,8 +82,9 @@ class WifiReceiver extends BroadcastReceiver {
         //화장실
         String testScanResult5 = "0a085299f792;-61/0a085299f793;-61/00300d8acf40;-62/0e09b4760884;-63/0009b4760884;-63/0609b4760884;-63/0a09b4760884;-63/1209b4760884;-63/06085299f792;-64/06300d8acf43;-64/06300d8acf42;-65/06085299f793;-65/0009b4760883;-65/0a09b4760883;-65/0609b4760883;-66/00300d8ada10;-66/0a300d8ada12;-66/0a300d8ada13;-66/00300d8ada00;-67/06300d8ada02;-67/06300d8ada03;-67/0a300d8acf52;-71/0a300d8acf53;-71/00300d8acf50;-72/1209b47608a4;-72/0009b47608a4;-72/0609b47608a4;-72/0a09b47608a4;-72/0e09b47608a4;-72/0a09b47608a3;-72/06085299f7a3;-73/06085299f7a2;-74/0217b20b4b7e;-76/2217b20b4b7e;-79/0217b20b4b7c;-80/12e3c70b2daf;-80/4cb1cd2f30d8;-81/2217b20b4b7c;-81/0a085299f7b2;-83/0a085299f7b3;-83/24d13f147e38;-83/06300d8ad8a3;-83/02e3c70b2daf;-83/0217b20b9dc7;-83/883c1ce8c243;-85/24d13f148118;-85/d861625087fd;-85/0217b20b5a5a;-86/0a085299f872;-87/4cb1cd6f30d8;-87/06085299f873;-87/b4a94f78a5db;-87/0217b20b9dd7;-87/12e3c70983a4;-88/0217b20b4c94;-89/2217b20b4b7c;-89/";
 
-        String[] testAps = testScanResult5.split("/");
+        String[] testAps = testScanResult3.split("/");
 
+        long start = System.currentTimeMillis();
         for (int i=0; i<testAps.length-1; i++) {
             String bssid;
             double rssi;
@@ -104,23 +94,26 @@ class WifiReceiver extends BroadcastReceiver {
 
             scanList.add(new SCANINFO(bssid, rssi));
         }
+        long end = System.currentTimeMillis();
+        System.out.println("scan time : " + (end - start)/1000.0);
 
+        start = System.currentTimeMillis();
         Estimate test = new Estimate(context, scanList);
-
         String scanResult = test.test_main();
+        end = System.currentTimeMillis();
+        System.out.println("estimate time : " + (end - start)/1000.0);
+
+        start = System.currentTimeMillis();
         if(scanResult.equals("NORESULT")) {
             result.setText("결과 없음");
             Toast.makeText(context, "결과 없음", Toast.LENGTH_SHORT).show();
         } else {
-            String[] result_array = scanResult.split("/");
-
-            float x = Float.parseFloat(result_array[0]);
-            float y = Float.parseFloat(result_array[1]);
-
-            mapDraw.setXY(x, y);
-            result.setText("x 좌표 : " + x + "\ny 좌표 : " + y);
+            result.setText(scanResult);
             Toast.makeText(context, "측정 완료!", Toast.LENGTH_SHORT).show();
         }
+        end = System.currentTimeMillis();
+        System.out.println("ui edit time : " + (end - start)/1000.0);
+
     }
 }
 

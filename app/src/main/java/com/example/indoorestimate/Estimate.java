@@ -161,7 +161,8 @@ public class Estimate {
 
             //by score => posIdxByScore
             //by ref => posIdxByRef
-            result = fpList.get(posIdxByScore).x + "/" +  fpList.get(posIdxByScore).y;
+
+            result = Integer.toString(fpList.get(posIdxByScore).idx);
 
             return result;
         }
