@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,8 +13,13 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,26 +44,26 @@ public class MainActivity extends AppCompatActivity {
 
     private Button startBtn;
     private TextView result;
-
-    List<SCANINFO> scanList = new ArrayList<>();
+    private TableLayout map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setUI();
-
         checkPermission();
         GPSCheck();
         checkNetwork();
         DBCheck();
+
+        setUI();
     }
 
     private void setUI() {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         startBtn = findViewById(R.id.startBtn);
         result = findViewById(R.id.result);
+        map = findViewById(R.id.map);
 
         startBtn.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -66,13 +72,61 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "측정중...", Toast.LENGTH_SHORT).show();
             }
         });
+
+        drawMap();
+    }
+
+    private void drawMap() {
+        int[][] mapXY = new int[76][8];
+
+        DBAdapter db = new DBAdapter(this);
+        String sql = "select CELL_X, CELL_Y from TR_FPDB_MAP;";
+        Cursor cursor = db.search(sql);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int cell_x = cursor.getInt(cursor.getColumnIndex("CELL_X"));
+                int cell_y = cursor.getInt(cursor.getColumnIndex("CELL_Y"));
+
+                mapXY[cell_y][cell_x] = 1;
+            }
+        }
+        cursor.close();
+
+        //db 닫기
+        try {
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i <= 75; i++) {
+            TableRow row = new TableRow(this);
+            row.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            for (int j = 0; j <= 7; j++) {
+                ImageView cell = new ImageView(this);
+                cell.setId((i*100) + j);
+
+                if(mapXY[i][j] == 1) {
+                    cell.setImageResource(R.drawable.cell_fill);
+                } else {
+                    cell.setImageResource(R.drawable.cell_blank);
+                }
+
+                cell.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                row.addView(cell);
+            }
+
+            map.addView(row);
+        }
     }
 
     //마지막 초기화 작업?? onresume은 activity가 전면에 나타날 때, oncreate 호출 이후에도 호출됨.
     @Override
     public void onResume() {
         super.onResume();
-        receiverWifi = new WifiReceiver(wifiManager, scanList, result);
+        receiverWifi = new WifiReceiver(wifiManager, result, map);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(receiverWifi, intentFilter);
@@ -169,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void DBdownload() {
-        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1OxArgC_Jh0CEUZrF0pP_ZPjm6KHgmeQA";
+        String DB_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1SmLb-kHpQQnZSP45bDJFDI2GjFM11EA8";
         new DBdownload(this).execute(DB_DOWNLOAD_URL, "1", "1");
     }
 

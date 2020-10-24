@@ -16,18 +16,18 @@ public class FP_POS {
    */
 
     int idx; //격자id
-    String gid; //역사id
-    String floor;  //층
     public double x; //평면좌표 x
     public double y; //평면좌표 y
     public int refCount; //todo : 일치하는 ap 수인 듯? 제대로 알아보기
     public double score; //todo: score가 정확히 뭔지 알아보기
+    public int cell_x;
+    public int cell_y;
 
-    public FP_POS(int idx, String gid, double x, double y, String floor) {
+    public FP_POS(int idx, double x, double y, int cell_x, int cell_y) {
         this.idx = idx;
-        this.gid = gid;
         this.x = x;
         this.y = y;
-        this.floor = floor;
+        this.cell_x = cell_x;
+        this.cell_y = cell_y;
     }
 }
