@@ -1,78 +1,31 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-
-
-    <LinearLayout
-        android:id="@+id/resultView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/resultViewTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFC107"
-            android:text="측정 결과"
-            android:textColor="#000000"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="left"
-            android:padding="5dp"
-            android:text="RESULT"
-            android:textColor="#000000"
-            android:textSize="18sp" />
-    </LinearLayout>
+    android:background="@android:color/holo_orange_light"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/sysMsgView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/blankView"
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFC107"
-            android:text="MAP"
+            android:gravity="center"
+            android:text="맵매칭을 합시다^^"
             android:textColor="#000000"
-            android:textSize="18sp" />
+            android:textSize="36sp" />
 
-        <ScrollView
+        <Button
+            android:id="@+id/startBtn"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TableLayout
-                android:id="@+id/map"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </TableLayout>
-        </ScrollView>
-
+            android:layout_height="wrap_content"
+            android:text="시작!" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/startBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFC107"
-        android:text="SCAN"
-        android:textColor="#000000"
-        android:textSize="18sp" />
-
 </LinearLayout>
-
