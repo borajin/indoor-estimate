@@ -197,7 +197,7 @@ public class Estimate {
         //최종 position reuslt
         if (fpList.size() > 0) {
             String result;
-            result = fpList.get(posIdxByRef).cell_x + "," + fpList.get(posIdxByRef).cell_y + fpList.get(posIdxByScore).cell_x + fpList.get(posIdxByScore).cell_y;
+            result = fpList.get(posIdxByRef).cell_x + "," + fpList.get(posIdxByRef).cell_y + "/" + fpList.get(posIdxByScore).cell_x + "," + fpList.get(posIdxByScore).cell_y;
             return result;
         }
 

@@ -16,7 +16,7 @@ class WifiReceiver extends BroadcastReceiver {
     private TableLayout map;
     private Estimate test;
 
-    private static int past_ref_x = 1, past_ref_y = 6, past_score_x = 1, past_score_y = 6;
+    private static int past_ref_x = 3, past_ref_y = 1, past_score_x = 3, past_score_y = 1;
 
     public WifiReceiver(Context context, WifiManager wifiManager, TableLayout map) {
         this.wifiManager = wifiManager;
@@ -64,16 +64,16 @@ class WifiReceiver extends BroadcastReceiver {
             score_y = Integer.parseInt(score.split(",")[1]);
 
             //이전 셀 색 지우기
-            ImageView past_ref_cell = map.findViewById(past_ref_x * 100 + past_ref_y);
+            ImageView past_ref_cell = map.findViewById(past_ref_y * 100 + past_ref_x);
             past_ref_cell.setImageResource(R.drawable.cell_fill);
 
-            ImageView past_score_cell = map.findViewById(past_score_x * 100 + past_score_y);
+            ImageView past_score_cell = map.findViewById(past_score_y * 100 + past_score_x);
             past_score_cell.setImageResource(R.drawable.cell_fill);
 
             //현재 셀 색 채우기
-            while (find_ref == true && find_score == true) {
+            while (find_ref == false || find_score == false) {
                 if(ref_x == score_x && ref_y == score_y) {
-                    ImageView ref_score_cell = map.findViewById(ref_x * 100 + ref_y);
+                    ImageView ref_score_cell = map.findViewById(ref_y * 100 + ref_x);
                     ref_score_cell.setImageResource(R.drawable.cell_ref_score_location);
 
                     past_ref_x = ref_x;
@@ -83,8 +83,8 @@ class WifiReceiver extends BroadcastReceiver {
                     find_score = true;
                 } else {
                     if (!find_ref) {
-                        if (Math.abs(ref_x - past_ref_x) <= REF_ERROR_RADIUS || Math.abs(ref_y - past_ref_y) <= REF_ERROR_RADIUS) {
-                            ImageView ref_cell = map.findViewById(ref_x * 100 + ref_y);
+                        if (Math.abs(ref_x - past_ref_x) + Math.abs(ref_y - past_ref_y) <= REF_ERROR_RADIUS) {
+                            ImageView ref_cell = map.findViewById(ref_y * 100 + ref_x);
                             ref_cell.setImageResource(R.drawable.cell_ref_location);
 
                             past_ref_x = ref_x;
@@ -97,8 +97,8 @@ class WifiReceiver extends BroadcastReceiver {
                     }
 
                     if (!find_score) {
-                        if (Math.abs(score_x - past_score_x) <= SCORE_ERROR_RADIUS || Math.abs(score_y - past_score_y) <= SCORE_ERROR_RADIUS) {
-                            ImageView score_cell = map.findViewById(score_x * 100 + score_y);
+                        if (Math.abs(score_x - past_score_x) + Math.abs(score_y - past_score_y) <= SCORE_ERROR_RADIUS) {
+                            ImageView score_cell = map.findViewById(score_y * 100 + score_x);
                             score_cell.setImageResource(R.drawable.cell_score_location);
 
                             past_score_x = score_x;
@@ -115,7 +115,7 @@ class WifiReceiver extends BroadcastReceiver {
             Toast.makeText(context, "빨강 : ref " + REF_ERROR_RADIUS + ", 파랑 : score" + SCORE_ERROR_RADIUS, Toast.LENGTH_LONG).show();
         }
 
-        wifiManager.startScan();
+        //wifiManager.startScan();
     }
 }
 
