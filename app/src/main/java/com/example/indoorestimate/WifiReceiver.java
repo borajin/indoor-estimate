@@ -9,35 +9,18 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 class WifiReceiver extends BroadcastReceiver {
     private WifiManager wifiManager;
     private TableLayout map;
-
-    boolean first_start = true;
-
     private Estimate test;
 
-    class position {
-        int x;
-        int y;
-
-        position(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    private Stack<position> pastPositions;
+    private int past_ref_x = 1, past_ref_y = 6, past_score_x = 1, past_score_y = 6;
 
     public WifiReceiver(Context context, WifiManager wifiManager, TableLayout map) {
         this.wifiManager = wifiManager;
         this.map = map;
-        pastPositions = new Stack<>();
         test = new Estimate(context);
     }
 
@@ -61,42 +44,62 @@ class WifiReceiver extends BroadcastReceiver {
 
         String estimateResult = test.startEstimate();   // x, y 셀값
 
-        if(estimateResult.equals("NORESULT")) {
+        if (estimateResult.equals("NORESULT")) {
             Toast.makeText(context, "결과 없음", Toast.LENGTH_SHORT).show();
         } else {
-            int past_x, past_y, current_x, current_y;
+            String ref = estimateResult.split("/")[0];
+            String score = estimateResult.split("/")[1];
+            int ref_x, ref_y;
+            int score_x, score_y;
 
-            current_x = Integer.parseInt(estimateResult.split(",")[0]);
-            current_y = Integer.parseInt(estimateResult.split(",")[1]);
+            int REF_ERROR_RADIUS = 2;
+            int SCORE_ERROR_RADIUS = 2;
+            boolean find_ref = false;
+            boolean find_score = false;
 
-            if(first_start) {
-                //처음 시작이면 과거 위치 = 현재위치가 같음
-                past_x = current_x;
-                past_y = current_y;
-            } else {
-                //처음 시작 아니면 과거 위치는 이전의 현재 위치값
-                past_x = pastPositions.peek().x;
-                past_y = pastPositions.peek().y;
-                first_start = false;
+            ref_x = Integer.parseInt(ref.split(",")[0]);
+            ref_y = Integer.parseInt(ref.split(",")[1]);
+
+            score_x = Integer.parseInt(score.split(",")[0]);
+            score_y = Integer.parseInt(score.split(",")[1]);
+
+            //이전 셀 색 지우기
+            ImageView past_ref_cell = map.findViewById(past_ref_x * 100 + past_ref_y);
+            past_ref_cell.setImageResource(R.drawable.cell_fill);
+
+            ImageView past_score_cell = map.findViewById(past_score_x * 100 + past_score_y);
+            past_score_cell.setImageResource(R.drawable.cell_fill);
+
+            //현재 셀 색 채우기
+            while (find_ref == true && find_score == true) {
+                if (!find_ref) {
+                    if (Math.abs(ref_x - past_ref_x) <= REF_ERROR_RADIUS || Math.abs(ref_y - past_ref_y) <= REF_ERROR_RADIUS) {
+                        ImageView ref_cell = map.findViewById(ref_x * 100 + ref_y);
+                        ref_cell.setImageResource(R.drawable.cell_ref_location);
+
+                        past_ref_x = ref_x;
+                        past_ref_y = ref_y;
+
+                        find_ref = true;
+                    } else {
+                        REF_ERROR_RADIUS++;
+                    }
+                }
+
+                if (!find_score) {
+                    if (Math.abs(score_x - past_score_x) <= SCORE_ERROR_RADIUS || Math.abs(score_y - past_score_y) <= SCORE_ERROR_RADIUS) {
+                        ImageView score_cell = map.findViewById(score_x * 100 + score_y);
+                        score_cell.setImageResource(R.drawable.cell_score_location);
+
+                        past_score_x = score_x;
+                        past_score_y = score_y;
+
+                        find_score = true;
+                    } else {
+                        SCORE_ERROR_RADIUS++;
+                    }
+                }
             }
-
-            //과거 위치 표시
-            ImageView past_cell = map.findViewById(past_y * 100 + past_x);
-            past_cell.setImageResource(R.drawable.cell_past_location);
-
-            //현재 위치 표시
-            ImageView current_cell;
-            if(Math.abs(current_x - past_x) <= 2 || Math.abs(current_y - past_y) <= 2) {
-                //셀 반경 2 이내면 현재 위치 표시, 위치 포함시키기
-                pastPositions.push(new position(current_x, current_y));
-                current_cell = map.findViewById(current_y*100+current_x);
-            } else {
-                //셀 반경 2를 벗어났다면 과거 위치를 현재 위치로 표시.
-                current_cell = map.findViewById(past_x*100+past_y);
-            }
-            current_cell.setImageResource(R.drawable.cell_location);
-
-            Toast.makeText(context, "측정 완료!", Toast.LENGTH_SHORT).show();
         }
 
         wifiManager.startScan();

@@ -119,7 +119,9 @@ public class Estimate {
 
         // search FP   <====    main algorithm !!
         List<FP_POS> fpList = new ArrayList<>();    //scan한 ap 정보와 유사한 position 리스트
-        int posIdxByScore = 0;      // final position by score..
+        int posIdxByRef = 0; // final position by ref count..
+        int posIdxByScore = 0; // final position by score..
+        int maxRefCount = 0;
         double maxScore = 0.0;
 
         for (SCANINFO scan : scanList) {
@@ -179,6 +181,10 @@ public class Estimate {
                     pos.refCount++;
                     pos.score += wfWeight;
                     // update final pos..
+                    if (pos.refCount > maxRefCount) {
+                        maxRefCount = pos.refCount;
+                        posIdxByRef = posIdx;
+                    }
                     if (pos.score > maxScore) {
                         maxScore = pos.score;
                         posIdxByScore = posIdx;
@@ -191,7 +197,7 @@ public class Estimate {
         //최종 position reuslt
         if (fpList.size() > 0) {
             String result;
-            result = fpList.get(posIdxByScore).cell_x + "," + fpList.get(posIdxByScore).cell_y;
+            result = fpList.get(posIdxByRef).cell_x + "," + fpList.get(posIdxByRef).cell_y + fpList.get(posIdxByScore).cell_x + fpList.get(posIdxByScore).cell_y;
             return result;
         }
 
