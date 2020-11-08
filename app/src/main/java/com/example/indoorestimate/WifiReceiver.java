@@ -52,8 +52,8 @@ class WifiReceiver extends BroadcastReceiver {
             int ref_x, ref_y;
             int score_x, score_y;
 
-            int REF_ERROR_RADIUS = 2;
-            int SCORE_ERROR_RADIUS = 2;
+            int REF_ERROR_RADIUS = 1;
+            int SCORE_ERROR_RADIUS = 1;
             boolean find_ref = false;
             boolean find_score = false;
 
@@ -112,7 +112,7 @@ class WifiReceiver extends BroadcastReceiver {
                 }
             }
 
-            Toast.makeText(context, "측정 완료! (빨강 : ref, 파랑 : score, 보라 : 둘 다 일치)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "빨강 : ref " + REF_ERROR_RADIUS + ", 파랑 : score" + SCORE_ERROR_RADIUS, Toast.LENGTH_LONG).show();
         }
 
         wifiManager.startScan();
